@@ -16,6 +16,9 @@ int main() {
                 UI::DisplayManager::handleHexEncoding();
                 break;
             case 3:
+                UI::DisplayManager::handleBase64();
+                break;
+            case 4:
                 std::cout << "\033[1;31m";
                 std::cout << "Goodbye!\n";
                 std::cout << "\033[0m";

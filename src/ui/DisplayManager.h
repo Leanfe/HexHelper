@@ -18,11 +18,16 @@
 #include "../encoding/ASCII.h"
 #include "../encoding/UNICODE.h"
 
+#include "../base64/Base64Encoder.h"
+#include "../base64/Base64Decoder.h"
 
+#include "../utils/Utils.h"
 using namespace std;
 
 using namespace Utils;
 using namespace Encoding;
+using namespace Base64;
+using namespace FileUtils;
 
 namespace UI {
 
@@ -108,8 +113,38 @@ namespace UI {
 
     };
 
+    class Base64OptionHandler {
+
+    public:
+        static void handleBase64Encode() {
+            string base64_string;
+            cout << "Enter string: ";
+            getline(cin, base64_string);
+
+            cout << "Result : " << Base64Encoder::base64_encode(base64_string) << '\n';
+        }
+
+        static void handleBase64Decode() {
+            string base64_string;
+            string filename;
+
+            cout << "Enter Base64 string: ";
+            getline(cin, base64_string);
+
+            cout << "Enter filename for save: ";
+            getline(cin, filename);
+
+            vector<byte> decoded_bytes = Base64Decoder::base64_decode(base64_string);
+
+            FileUtils::Utils::write_bytes_to_file(filename, reinterpret_cast<const char*>(decoded_bytes.data()), decoded_bytes.size());
+
+            cout << "Done! \n";
+        }
+    };
+
     class DisplayManager {
     public:
+
         static void displayMainMenu() {
             cout << "\033[1;36m";
             cout << "*********************************************\n";
@@ -119,9 +154,37 @@ namespace UI {
             cout << "*********************************************\n";
             cout << "1. Handle ASCII/Unicode conversion\n";
             cout << "2. Handle hex encoding/decoding\n";
-            cout << "3. Exit\n";
+            cout << "3. Base64 Encoder & Decoder.\n";
+            cout << "4. Exit\n";
             cout << "*********************************************\n";
             cout << "\033[0m";
+        }
+
+        static void handleBase64() {
+            int choice;
+            do {
+                displayBase64Menu();
+                cin >> choice;
+
+                switch (choice) {
+                    case 1:
+                        Base64OptionHandler::handleBase64Encode();
+                        break;
+                    case 2:
+                        Base64OptionHandler::handleBase64Decode();
+                        break;
+                    case 3:
+                        cout << "\033[1;32m";
+                        cout << "Returning to main menu...\n";
+                        cout << "\033[0m";
+                        break;
+                    default:
+                        cout << "\033[1;31m";
+                        cout << "Invalid choice, please try again.\n";
+                        cout << "\033[0m";
+                        break;
+                }
+            } while (choice != 3);
         }
 
         static void handleAsciiUnicodeConversion() {
@@ -200,6 +263,14 @@ namespace UI {
             cout << "-------------------------------" << endl;
             cout << "1. Convert ASCII to Unicode" << endl;
             cout << "2. Convert Unicode to ASCII" << endl;
+            cout << "3. Back to Main Menu" << endl;
+        }
+
+        static void displayBase64Menu() {
+            cout << "\nBase64 Conversion Menu" << endl;
+            cout << "-------------------------------" << endl;
+            cout << "1. Base64 encode." << endl;
+            cout << "2. Base64 decode." << endl;
             cout << "3. Back to Main Menu" << endl;
         }
 
